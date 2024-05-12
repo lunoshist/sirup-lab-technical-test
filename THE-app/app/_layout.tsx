@@ -58,7 +58,7 @@ export default function RootLayout() {
   );
 }
 
-AppRegistry.registerComponent('TRY', () => RootLayout);
+AppRegistry.registerComponent('THE-app', () => RootLayout);
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
@@ -67,7 +67,6 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
   );

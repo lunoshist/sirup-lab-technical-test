@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import BookCard from '@/components/BookCard';
-import { Book } from '@/types/Bookook';
+import { Book } from '@/types/Book';
 
 import { gql, useQuery } from '@apollo/client';
 

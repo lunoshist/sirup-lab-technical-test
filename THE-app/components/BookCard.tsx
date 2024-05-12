@@ -14,7 +14,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   return (
     <View style={styles.card}>
       {book.url ? (
-        <Image source={{ uri: book.url }} style={styles.image} resizeMode="center" />
+        <Image source={{ uri: book.url }} style={styles.image}/>
       ) : (
         <View style={styles.imagePlaceholder}>
           <Text>No Image</Text>
