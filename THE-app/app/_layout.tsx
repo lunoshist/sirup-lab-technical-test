@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-
+import { NativeBaseProvider, Box } from "native-base";
 import { useColorScheme } from '@/components/useColorScheme';
 
 import { AppRegistry } from 'react-native';
@@ -53,7 +53,9 @@ export default function RootLayout() {
 
   return (
     <ApolloProvider client={client}>
-      <RootLayoutNav />
+      <NativeBaseProvider>
+        <RootLayoutNav />
+      </NativeBaseProvider>
     </ApolloProvider>
   );
 }
