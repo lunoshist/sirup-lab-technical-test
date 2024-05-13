@@ -1,5 +1,5 @@
 export interface Chapter {
-    id: Int16Array;
+    id: number;
     title: string;
     url: string;
     valid: boolean;

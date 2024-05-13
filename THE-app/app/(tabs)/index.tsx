@@ -67,7 +67,7 @@ function BooksScreen() {
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error :( {error.message}</Text>;
 
-  const books: Book[] = data.viewer.books.hits.filter((book: Book) => book.valid);
+  const books: Book[] = data.viewer.books.hits;
 
   // FILTER
   let filteredBooks = books;
@@ -90,12 +90,19 @@ function BooksScreen() {
     );
   }
 
+  
   // SORT
-  filteredBooks.sort((a: Book, b: Book) => {
+  const sortedBooks = [...filteredBooks].sort((a: Book, b: Book) => {
+    if (!a.levels[0] || !a.subjects[0]) {
+        return 1;  
+    }
+    if (!b.levels[0] || !b.subjects[0]) {
+        return -1;
+    }
     const levelComparison = a.levels[0].name.localeCompare(b.levels[0].name);
     if (levelComparison !== 0) return levelComparison;
     return a.subjects[0].name.localeCompare(b.subjects[0].name);
-  });
+});
 
 
   return (
@@ -130,7 +137,7 @@ function BooksScreen() {
         </View>
       </View>
       {/** Then display a card for each book */}
-      {filteredBooks.map((book: Book) => (
+      {sortedBooks.map((book: Book) => (
         book.valid ? (
           <BookCard key={book.id.toString()} book={book} />
         ) : (
