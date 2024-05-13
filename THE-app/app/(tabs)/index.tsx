@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FlatList, StyleSheet, Dimensions, TextInput, SafeAreaView } from 'react-native';
+import { FlatList, StyleSheet, Dimensions, TextInput } from 'react-native';
 import { Select } from "native-base";
 import { Text, View } from '@/components/Themed';
 import BookCard from '@/components/BookCard';
+import InvalidBookCard from '@/components/InvalidBookCard';
 import { Book } from '@/types/Book';
 
 import { gql, useQuery } from '@apollo/client';
@@ -54,7 +55,7 @@ function BooksScreen() {
 
   // Avant loading & error return car sinon c'est un hook conditionnel & sa viole les règles de React
   const books: Book[] = useMemo(() => {
-    return data?.viewer?.books?.hits?.filter((book: Book) => book.valid) || [];
+    return data?.viewer?.books?.hits || [];
   }, [data]);
 
   const [filterText, setFilterText] = useState('');
@@ -67,8 +68,12 @@ function BooksScreen() {
 
     if (data?.viewer?.books?.hits) {
       data.viewer.books.hits.forEach((book: Book) => {
-        book.subjects.forEach((subject) => subjectsSet.add(subject.name));
-        book.levels.forEach((level) => levelsSet.add(level.name));
+        if (book.subjects) {
+          book.subjects.forEach((subject) => subjectsSet.add(subject.name));
+        }
+        if (book.levels) {
+          book.levels.forEach((level) => levelsSet.add(level.name));
+        }
       });
     }
 
@@ -94,14 +99,15 @@ function BooksScreen() {
         return matchesText && matchesSubject && matchesLevel;
       })
       .sort((a, b) => {
-        const levelComparison = a.levels[0].name.localeCompare(b.levels[0].name);
+        const levelComparison = a.levels[0]?.name.localeCompare(b.levels[0]?.name);
         if (levelComparison !== 0) return levelComparison;
-        return a.subjects[0].name.localeCompare(b.subjects[0].name);
+        return a.subjects[0]?.name.localeCompare(b.subjects[0]?.name);
       });
   }, [books, filterText, selectedSubject, selectedLevel]);
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error :( {error.message}</Text>;
+
 
   return (
     <>
@@ -133,10 +139,17 @@ function BooksScreen() {
           </Select>
         </View>
       </View>
+      {/** Then display a card for each book */}
       <FlatList
         style={styles.container}
         data={filteredBooks}
-        renderItem={({ item }) => <BookCard book={item} />}
+        renderItem={({ item }) =>
+          item.valid ? (
+            <BookCard key={item.id.toString()} book={item} />
+          ) : (
+            <InvalidBookCard key={item.id.toString()} book={item} />
+          )
+        }
         keyExtractor={item => item.id}
         numColumns={numColumns}
         key={numColumns} // Force FlatList à se re-render quand le nombre de colonnes change
