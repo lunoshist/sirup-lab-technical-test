@@ -21,7 +21,7 @@ const InvalidBookCard: React.FC<BookCardProps> = ({ book }) => {
             <Text>No Image</Text>
           </View>
         )}
-        <BlurView style={styles.overlay} tint="dark" intensity={25} experimentalBlurMethod='dimezisBlurView'>
+        <BlurView style={styles.overlay} tint="dark" intensity={50} experimentalBlurMethod='dimezisBlurView'>
           <Text style={styles.title}>{book.displayTitle}</Text>
         </BlurView>
       </View>
@@ -30,19 +30,8 @@ const InvalidBookCard: React.FC<BookCardProps> = ({ book }) => {
 
 const styles = StyleSheet.create({
   cardInvalid: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Fond semi-transparent
-    flex: 1,
-    minWidth: 150,
-    maxWidth: (windowWidth - 30) / 2,
-    marginHorizontal: 5,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  card: {
+    opacity: .3,
+
     flex: 1,
     minWidth: 150,
     maxWidth: (windowWidth - 30) / 2,
@@ -60,7 +49,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     width: '100%',
-    height: '100%',
+    aspectRatio: 5/7,
     backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',
@@ -74,6 +63,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
     alignItems: 'center',
+    justifyContent: 'center'
   },
   title: {
     padding: 10,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Image, View, StyleSheet, Dimensions } from 'react-native';
+import { Pressable, Image, View, StyleSheet, Dimensions } from 'react-native';
 import { Text } from './Themed';
 import { Book } from '@/types/Book';
 import { BlurView } from 'expo-blur';
@@ -15,7 +15,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
 
   return (
     <Link href={`/chapterScreen?bookId=${book.id}`} asChild>
-      <View style={styles.card}>
+      <Pressable style={styles.card}>
         {book.url ? (
           <Image source={{ uri: book.url }} style={styles.image}/>
         ) : (
@@ -26,7 +26,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         <BlurView style={styles.overlay} tint="dark" intensity={25} experimentalBlurMethod='dimezisBlurView'>
           <Text style={styles.title}>{book.displayTitle}</Text>
         </BlurView>
-      </View>
+      </Pressable>
     </Link>
   );
 };
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     width: '100%',
-    height: '100%',
+    aspectRatio: 5/7,
     backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',

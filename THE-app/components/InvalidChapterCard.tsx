@@ -10,9 +10,9 @@ interface ChapterCardProps {
 
 const windowWidth = Dimensions.get('window').width;
 
-const ChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
+const InvalidChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
   return (
-    <View style={styles.card}>
+    <View style={styles.InvalidCard}>
       {chapter.url ? (
         <Image source={{ uri: chapter.url }} style={styles.image}/>
       ) : (
@@ -28,7 +28,9 @@ const ChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
 };
 
 const styles = StyleSheet.create({
-  card: {
+  InvalidCard: {
+    opacity: .3,
+
     flex: 1,
     minWidth: 150,
     maxWidth: (windowWidth - 30) / 2,
@@ -69,4 +71,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChapterCard;
+export default InvalidChapterCard;

@@ -3,6 +3,7 @@ import { useRoute } from '@react-navigation/native';
 import { ScrollView, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import ChapterCard from '@/components/ChapterCard';
+import InvalidChapterCard from '@/components/InvalidChapterCard';
 import { Chapter } from '@/types/Chapter';
 
 import { gql, useQuery } from '@apollo/client';
@@ -10,7 +11,7 @@ import { gql, useQuery } from '@apollo/client';
 const GET_CHAPTER = gql`
 query chapters($bookId: Int) {
     viewer {
-      chapters(first: 2, bookIds: [$bookId]) {
+      chapters(bookIds: [$bookId]) {
         hits {
           id
           title
@@ -24,7 +25,7 @@ query chapters($bookId: Int) {
 
 export default function ModalScreen() {
   const route = useRoute();
-  let bookId  = route.params.bookId as { bookId: Int16Array };
+  let bookId  = route.params.bookId as { bookId: number };
   bookId = Number(bookId);
     
   const { loading, error, data } = useQuery(GET_CHAPTER,
@@ -35,12 +36,16 @@ export default function ModalScreen() {
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error :( {error.message}</Text>;
 
-  const chapter: Chapter[] = data.viewer.chapters.hits.filter((chapter: Chapter) => chapter.valid);
+  const chapter: Chapter[] = data.viewer.chapters.hits;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {chapter.map((chapter: Chapter) => (
-        <ChapterCard key={chapter.id.toString()} chapter={chapter} />
+        chapter.valid ? (
+          <ChapterCard key={chapter.id.toString()} chapter={chapter} />
+        ) : (
+          <InvalidChapterCard key={chapter.id.toString()} chapter={chapter} />
+        )
       ))}
     </ScrollView>
   );
