@@ -1,5 +1,5 @@
 export interface Book {
-    id: string;
+    id: Int16Array;
     displayTitle: string;
     url: string;
     description: string;

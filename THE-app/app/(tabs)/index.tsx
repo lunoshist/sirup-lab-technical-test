@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, TextInput } from 'react-native';
 import { Select } from "native-base";
 import { Text, View } from '@/components/Themed';
 import BookCard from '@/components/BookCard';
+import InvalidBookCard from '@/components/InvalidBookCard';
 import { Book } from '@/types/Book';
 
 import { gql, useQuery } from '@apollo/client';
@@ -130,7 +131,11 @@ function BooksScreen() {
       </View>
       {/** Then display a card for each book */}
       {filteredBooks.map((book: Book) => (
-        <BookCard key={book.id} book={book} />
+        book.valid ? (
+          <BookCard key={book.id.toString()} book={book} />
+        ) : (
+          <InvalidBookCard key={book.id.toString()} book={book} />
+        )
       ))}
     </ScrollView>
   );

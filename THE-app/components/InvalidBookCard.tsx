@@ -1,9 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Image, View, StyleSheet, Dimensions } from 'react-native';
+import { Image, View, StyleSheet, Dimensions } from 'react-native';
 import { Text } from './Themed';
 import { Book } from '@/types/Book';
 import { BlurView } from 'expo-blur';
-import { Link } from 'expo-router';
 
 interface BookCardProps {
   book: Book;
@@ -11,11 +10,10 @@ interface BookCardProps {
 
 const windowWidth = Dimensions.get('window').width;
 
-const BookCard: React.FC<BookCardProps> = ({ book }) => {
+const InvalidBookCard: React.FC<BookCardProps> = ({ book }) => {
 
   return (
-    <Link href={`/chapterScreen?bookId=${book.id}`} asChild>
-      <View style={styles.card}>
+      <View style={styles.cardInvalid}>
         {book.url ? (
           <Image source={{ uri: book.url }} style={styles.image}/>
         ) : (
@@ -27,7 +25,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           <Text style={styles.title}>{book.displayTitle}</Text>
         </BlurView>
       </View>
-    </Link>
   );
 };
 
@@ -86,4 +83,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BookCard;
+export default InvalidBookCard;
