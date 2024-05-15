@@ -30,8 +30,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    minWidth: 150,
-    maxWidth: (windowWidth - 30) / 2,
     marginHorizontal: 5,
     marginBottom: 20,
     borderWidth: 1,

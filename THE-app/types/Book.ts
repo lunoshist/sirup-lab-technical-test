@@ -3,7 +3,7 @@ export interface Book {
     displayTitle: string;
     url: string;
     description: string;
-    subjects: { name: string }[];
-    levels: { name: string }[];
+    subjects: Array<{ name: string }>;
+    levels: Array<{ name: string }>;
     valid: boolean;
 }
