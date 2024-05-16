@@ -8,6 +8,15 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
+import { AppRegistry } from 'react-native';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+// Initialize Apollo Client
+const client = new ApolloClient({
+  uri: 'https://api-preprod.lelivrescolaire.fr/graph',
+  cache: new InMemoryCache()
+});
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -42,8 +51,14 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <ApolloProvider client={client}>
+      <RootLayoutNav />
+    </ApolloProvider>
+  );
 }
+
+AppRegistry.registerComponent('THE-app', () => RootLayout);
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
@@ -52,7 +67,6 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
   );
