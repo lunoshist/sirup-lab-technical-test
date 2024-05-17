@@ -1,41 +1,34 @@
 import React from 'react';
-import { Pressable, Image, View, StyleSheet } from 'react-native';
+import { Image, View, StyleSheet, Dimensions } from 'react-native';
 import { Text } from './Themed';
-import { Book } from '@/types/Book';
+import { Chapter } from '@/types/Chapter';
 import { BlurView } from 'expo-blur';
-import { Link } from 'expo-router';
 
-interface BookCardProps {
-  book: Book;
+interface ChapterCardProps {
+  chapter: Chapter;
 }
 
-const BookCard: React.FC<BookCardProps> = ({ book }) => {
+const windowWidth = Dimensions.get('window').width;
+
+const ChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
   const combinedStyles = {
     ...styles.card,
-    ...(!book.valid && styles.invalid),
+    ...(!chapter.valid && styles.invalid),
   };
 
-  const CardContent = (
+  return (
     <View style={combinedStyles}>
-      {book.url ? (
-        <Image source={{ uri: book.url }} style={styles.image}/>
+      {chapter.url ? (
+        <Image source={{ uri: chapter.url }} style={styles.image}/>
       ) : (
         <View style={[styles.image, styles.imagePlaceholder]}>
           <Text>No Image</Text>
         </View>
       )}
       <BlurView style={styles.overlay} tint="dark" intensity={25} experimentalBlurMethod='dimezisBlurView'>
-        <Text style={styles.title}>{book.displayTitle}</Text>
+        <Text style={styles.title}>{chapter.title}</Text>
       </BlurView>
     </View>
-  )
-
-  return book.valid ? (
-    <Link href={{ pathname: "/chapterScreen", params: { bookId: book.id } }} asChild>
-      {CardContent}
-    </Link>
-  ) : (
-    <>{CardContent}</>
   );
 };
 
@@ -80,4 +73,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BookCard;
+export default ChapterCard;

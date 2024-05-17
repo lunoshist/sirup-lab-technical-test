@@ -11,6 +11,8 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { AppRegistry } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
+import ChapterScreen from "@/app/chapterScreen";
+
 // Initialize Apollo Client
 const client = new ApolloClient({
   uri: 'https://api-preprod.lelivrescolaire.fr/graph',
@@ -69,6 +71,7 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="ChapterScreen" initialParams={{ bookId: '' }} options={{ title: "Chapitre", headerShown: false , presentation: 'modal'}}/>
       </Stack>
     </ThemeProvider>
   );
