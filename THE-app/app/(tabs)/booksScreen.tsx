@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FlatList, StyleSheet, Dimensions } from 'react-native';
+import { FlatList, StyleSheet, Dimensions, TextInput, SafeAreaView } from 'react-native';
+import { Select } from "native-base";
 import { Text, View } from '@/components/Themed';
 import BookCard from '@/components/BookCard';
 import { Book } from '@/types/Book';
@@ -56,18 +57,91 @@ function BooksScreen() {
     return data?.viewer?.books?.hits?.filter((book: Book) => book.valid) || [];
   }, [data]);
 
+  const [filterText, setFilterText] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState('');
+
+  const [subjectOptions, levelOptions] = useMemo(() => {
+    const subjectsSet = new Set<string>();
+    const levelsSet = new Set<string>();
+
+    if (data?.viewer?.books?.hits) {
+      data.viewer.books.hits.forEach((book: Book) => {
+        book.subjects.forEach((subject) => subjectsSet.add(subject.name));
+        book.levels.forEach((level) => levelsSet.add(level.name));
+      });
+    }
+
+    const subjectsArray = Array.from(subjectsSet).sort();
+    const levelsArray = Array.from(levelsSet).sort();
+
+    return [
+      subjectsArray.map(subject => <Select.Item key={subject} label={subject} value={subject} />),
+      levelsArray.map(level => <Select.Item key={level} label={level} value={level} />)
+    ];
+  }, [data]);
+
+  const filteredBooks = useMemo(() => {
+    const searchText = filterText.toLowerCase();
+
+    return books
+      .filter((book) => {
+        const matchesText = !filterText || Object.values(book).some(value =>
+          typeof value === 'string' && value.toLowerCase().includes(searchText)
+        );
+        const matchesSubject = !selectedSubject || book.subjects.some(subject => subject.name === selectedSubject);
+        const matchesLevel = !selectedLevel || book.levels.some(level => level.name === selectedLevel);
+        return matchesText && matchesSubject && matchesLevel;
+      })
+      .sort((a, b) => {
+        const levelComparison = a.levels[0].name.localeCompare(b.levels[0].name);
+        if (levelComparison !== 0) return levelComparison;
+        return a.subjects[0].name.localeCompare(b.subjects[0].name);
+      });
+  }, [books, filterText, selectedSubject, selectedLevel]);
+
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error :( {error.message}</Text>;
 
   return (
-    <FlatList
-      style={styles.container}
-      data={books}
-      renderItem={({ item }) => <BookCard book={item} />}
-      keyExtractor={item => item.id}
-      numColumns={numColumns}
-      key={numColumns} // Force FlatList à se re-render quand le nombre de colonnes change
-    />
+    <>
+      <View style={styles.filterContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Filter by title, description, or subject"
+          onChangeText={(text) => setFilterText(text)}
+          value={filterText}
+        />
+        <View style={styles.selectContainer}>
+          <Select
+            placeholder="Selection une matière"
+            selectedValue={selectedSubject}
+            flex={1}
+            onValueChange={(itemValue: string) => setSelectedSubject(itemValue)}
+          >
+            <Select.Item label="Select Subject" value="" />
+            {subjectOptions}
+          </Select>
+          <Select
+            placeholder="Selectionner le niveau"
+            selectedValue={selectedLevel}
+            flex={1}
+            onValueChange={(itemValue: string) => setSelectedLevel(itemValue)}
+          >
+            <Select.Item label="Select Level" value="" />
+            {levelOptions}
+          </Select>
+        </View>
+      </View>
+      <FlatList
+        style={styles.container}
+        data={filteredBooks}
+        renderItem={({ item }) => <BookCard book={item} />}
+        keyExtractor={item => item.id}
+        numColumns={numColumns}
+        key={numColumns} // Force FlatList à se re-render quand le nombre de colonnes change
+      />
+    </>
   );
 }
 
@@ -76,6 +150,25 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
     paddingVertical: 20,
+  },
+  filterContainer: {
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  selectContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    marginBottom: 10,
+    padding: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
   },
 });
 
