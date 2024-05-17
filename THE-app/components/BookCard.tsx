@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Image, View, StyleSheet, Dimensions } from 'react-native';
+import { Pressable, Image, View, StyleSheet } from 'react-native';
 import { Text } from './Themed';
 import { Book } from '@/types/Book';
 import { BlurView } from 'expo-blur';
@@ -9,41 +9,39 @@ interface BookCardProps {
   book: Book;
 }
 
-const windowWidth = Dimensions.get('window').width;
-
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
+  const combinedStyles = {
+    ...styles.card,
+    ...(!book.valid && styles.invalid),
+  };
 
-  return (
-    <Link href={`/chapterScreen?bookId=${book.id}`} asChild>
-      <Pressable style={styles.card}>
-        {book.url ? (
-          <Image source={{ uri: book.url }} style={styles.image}/>
-        ) : (
-          <View style={styles.imagePlaceholder}>
-            <Text>No Image</Text>
-          </View>
-        )}
-        <BlurView style={styles.overlay} tint="dark" intensity={25} experimentalBlurMethod='dimezisBlurView'>
-          <Text style={styles.title}>{book.displayTitle}</Text>
-        </BlurView>
-      </Pressable>
+  const CardContent = (
+    <View style={combinedStyles}>
+      {book.url ? (
+        <Image source={{ uri: book.url }} style={styles.image}/>
+      ) : (
+        <View style={[styles.image, styles.imagePlaceholder]}>
+          <Text>No Image</Text>
+        </View>
+      )}
+      <BlurView style={styles.overlay} tint="dark" intensity={25} experimentalBlurMethod='dimezisBlurView'>
+        <Text style={styles.title}>{book.displayTitle}</Text>
+      </BlurView>
+    </View>
+  )
+
+  return book.valid ? (
+    <Link href={{ pathname: "/chapterScreen", params: { bookId: book.id } }} asChild>
+      {CardContent}
     </Link>
+  ) : (
+    <>{CardContent}</>
   );
 };
 
 const styles = StyleSheet.create({
-  cardInvalid: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Fond semi-transparent
-    flex: 1,
-    minWidth: 150,
-    maxWidth: (windowWidth - 30) / 2,
-    marginHorizontal: 5,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    overflow: 'hidden',
-    position: 'relative',
+  invalid: {
+    opacity: 0.3,
   },
   card: {
     flex: 1,
@@ -60,8 +58,6 @@ const styles = StyleSheet.create({
     aspectRatio: 5/7,
   },
   imagePlaceholder: {
-    width: '100%',
-    aspectRatio: 5/7,
     backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',

@@ -3,7 +3,6 @@ import { FlatList, StyleSheet, Dimensions, TextInput } from 'react-native';
 import { Select } from "native-base";
 import { Text, View } from '@/components/Themed';
 import BookCard from '@/components/BookCard';
-import InvalidBookCard from '@/components/InvalidBookCard';
 import { Book } from '@/types/Book';
 
 import { gql, useQuery } from '@apollo/client';
@@ -143,14 +142,8 @@ function BooksScreen() {
       <FlatList
         style={styles.container}
         data={filteredBooks}
-        renderItem={({ item }) =>
-          item.valid ? (
-            <BookCard key={item.id.toString()} book={item} />
-          ) : (
-            <InvalidBookCard key={item.id.toString()} book={item} />
-          )
-        }
-        keyExtractor={item => item.id}
+        renderItem={({ item }) => <BookCard book={item} />}
+        keyExtractor={item => item.id.toString()}
         numColumns={numColumns}
         key={numColumns} // Force FlatList à se re-render quand le nombre de colonnes change
       />

@@ -11,12 +11,17 @@ interface ChapterCardProps {
 const windowWidth = Dimensions.get('window').width;
 
 const ChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
+  const combinedStyles = {
+    ...styles.card,
+    ...(!chapter.valid && styles.invalid),
+  };
+
   return (
-    <View style={styles.card}>
+    <View style={combinedStyles}>
       {chapter.url ? (
         <Image source={{ uri: chapter.url }} style={styles.image}/>
       ) : (
-        <View style={styles.imagePlaceholder}>
+        <View style={[styles.image, styles.imagePlaceholder]}>
           <Text>No Image</Text>
         </View>
       )}
@@ -28,10 +33,11 @@ const ChapterCard: React.FC<ChapterCardProps> = ({ chapter }) => {
 };
 
 const styles = StyleSheet.create({
+  invalid: {
+    opacity: 0.3,
+  },
   card: {
     flex: 1,
-    minWidth: 150,
-    maxWidth: (windowWidth - 30) / 2,
     marginHorizontal: 5,
     marginBottom: 20,
     borderWidth: 1,
@@ -45,8 +51,6 @@ const styles = StyleSheet.create({
     aspectRatio: 5/7,
   },
   imagePlaceholder: {
-    width: '100%',
-    aspectRatio: 5/7,
     backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',
