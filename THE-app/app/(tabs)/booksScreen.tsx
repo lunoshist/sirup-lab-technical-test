@@ -61,68 +61,50 @@ function BooksScreen() {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
 
-  let subjectOptions: JSX.Element[] = [];
-  let levelOptions: JSX.Element[] = [];
-
-  if (!loading && !error && data) {
-    // Extract subjects and levels from the data
+  const [subjectOptions, levelOptions] = useMemo(() => {
     const subjectsSet = new Set<string>();
     const levelsSet = new Set<string>();
 
-    data.viewer.books.hits.forEach((book: Book) => {
-      book.subjects.forEach((subject) => subjectsSet.add(subject.name));
-      book.levels.forEach((level) => levelsSet.add(level.name));
-    });
+    if (data?.viewer?.books?.hits) {
+      data.viewer.books.hits.forEach((book: Book) => {
+        book.subjects.forEach((subject) => subjectsSet.add(subject.name));
+        book.levels.forEach((level) => levelsSet.add(level.name));
+      });
+    }
 
-    // Convert sets to arrays and sort them
     const subjectsArray = Array.from(subjectsSet).sort();
     const levelsArray = Array.from(levelsSet).sort();
 
-    // Create options for subjects
-    subjectOptions = subjectsArray.map((subject) => (
-      <Select.Item key={subject} label={subject} value={subject} />
-    ));
+    return [
+      subjectsArray.map(subject => <Select.Item key={subject} label={subject} value={subject} />),
+      levelsArray.map(level => <Select.Item key={level} label={level} value={level} />)
+    ];
+  }, [data]);
 
-    // Create options for levels
-    levelOptions = levelsArray.map((level) => (
-      <Select.Item key={level} label={level} value={level} />
-    ));
-  }
+  const filteredBooks = useMemo(() => {
+    const searchText = filterText.toLowerCase();
+
+    return books
+      .filter((book) => {
+        const matchesText = !filterText || Object.values(book).some(value =>
+          typeof value === 'string' && value.toLowerCase().includes(searchText)
+        );
+        const matchesSubject = !selectedSubject || book.subjects.some(subject => subject.name === selectedSubject);
+        const matchesLevel = !selectedLevel || book.levels.some(level => level.name === selectedLevel);
+        return matchesText && matchesSubject && matchesLevel;
+      })
+      .sort((a, b) => {
+        const levelComparison = a.levels[0].name.localeCompare(b.levels[0].name);
+        if (levelComparison !== 0) return levelComparison;
+        return a.subjects[0].name.localeCompare(b.subjects[0].name);
+      });
+  }, [books, filterText, selectedSubject, selectedLevel]);
 
   if (loading) return <Text>Loading...</Text>;
   if (error) return <Text>Error :( {error.message}</Text>;
 
-  // FILTER
-  let filteredBooks = books;
-  if (filterText) {
-    const searchText = filterText.toLowerCase();
-    filteredBooks = filteredBooks.filter((book: Book) =>
-      Object.values(book).some((value: any) =>
-        typeof value === 'string' && value.toLowerCase().includes(searchText)
-      )
-    );
-  }
-  if (selectedSubject) {
-    filteredBooks = filteredBooks.filter((book: Book) =>
-      book.subjects.some((subject) => subject.name === selectedSubject)
-    );
-  }
-  if (selectedLevel) {
-    filteredBooks = filteredBooks.filter((book: Book) =>
-      book.levels.some((level) => level.name === selectedLevel)
-    );
-  }
-
-  // SORT
-  filteredBooks.sort((a: Book, b: Book) => {
-    const levelComparison = a.levels[0].name.localeCompare(b.levels[0].name);
-    if (levelComparison !== 0) return levelComparison;
-    return a.subjects[0].name.localeCompare(b.subjects[0].name);
-  });
-
-
   return (
-    <SafeAreaView>
+    <>
       <View style={styles.filterContainer}>
         <TextInput
           style={styles.input}
@@ -150,16 +132,16 @@ function BooksScreen() {
             {levelOptions}
           </Select>
         </View>
-      <View />
+      </View>
       <FlatList
         style={styles.container}
-        data={books}
+        data={filteredBooks}
         renderItem={({ item }) => <BookCard book={item} />}
         keyExtractor={item => item.id}
         numColumns={numColumns}
         key={numColumns} // Force FlatList à se re-render quand le nombre de colonnes change
       />
-    </SafeAreaView>
+    </>
   );
 }
 
